@@ -1,17 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Router } from 'react-router-dom';
 
-import Header from './components/template/Header';
-import Menu from './components/template/Menu';
-import Dashboard from './components/template/Dashboard';
-import Footer from './components/template/Footer';
+import Routes from './routers/Routes';
+import history from './routers/History';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Header/>
-    <Menu/>
-    <Dashboard/>
-    <Footer/>
+    <Router history={history}>
+      <Routes />
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
