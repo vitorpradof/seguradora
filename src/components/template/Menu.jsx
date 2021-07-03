@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 
-import { MdDashboard, MdGroup } from 'react-icons/md';
+import { MdDashboard, MdGroup, MdInsertDriveFile } from 'react-icons/md';
 
 function Menu() {
   return (
@@ -16,6 +16,16 @@ function Menu() {
               >
                 <MdDashboard />
                 <p style={{ marginLeft: 5 }}>Dashboard</p>
+              </NavLink>
+            </li>
+            <li className='nav-item'>
+              <NavLink
+                type='button'
+                to='/apolices'
+                className='nav-link d-flex align-items-center'
+              >
+                <MdInsertDriveFile />
+                <p style={{ marginLeft: 5 }}>Apolices</p>
               </NavLink>
             </li>
             <li className='nav-item'>
