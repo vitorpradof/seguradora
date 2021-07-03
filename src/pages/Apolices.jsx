@@ -11,15 +11,32 @@ function Apolices() {
   const [iniciando, setIniciando] = useState(true);
   const [apolices, setApolices] = useState([]);
   const [novaApolice, setNovaApolice] = useState({ apoliceNumero: 0, placa: "", vigenciaInicio: "", vigenciaFim: "", valor: "" });
+  const [apoliceSelecionada, setApoliceSelecionada] = useState({});
   const [exibirModalCriarApolice, setExibirModalCriarApolice] = useState(false);
+  const [exibirModalEditarApolice, setExibirModalEditarApolice] = useState(false);
+  const [exibirModalExcluirApolice, setExibirModalExcluirApolice] = useState(false);
 
   useEffect (() => {
+    resetarApoliceSelecionada();
     getApolices();
   }, []);
 
   useEffect (() => {
     if (apolices.length) localStorage.setItem("apolices", JSON.stringify(apolices));
   }, [apolices]);
+
+  function resetarApoliceSelecionada() {
+    setApoliceSelecionada({ 
+      apoliceNumero: 0,
+      diasAteOVencimento: 0,
+      id: "",
+      placa: "",
+      status: "",
+      valor: 0,
+      vigenciaFim: "",
+      vigenciaInicio: ""
+    });
+  }
 
   function criarId() {
     let stringAleatoria = '',
@@ -46,18 +63,23 @@ function Apolices() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
-  function calcularDiasDoVencimento() {
-    let diferenca = moment(novaApolice.vigenciaFim, "YYYY/MM/DD").diff(moment(novaApolice.vigenciaInicio, "YYYY/MM/DD"));
+  function calcularDiasDoVencimento(apolice) {
+    let diferenca = moment(apolice.vigenciaFim, "YYYY/MM/DD").diff(moment(apolice.vigenciaInicio, "YYYY/MM/DD"));
     return moment.duration(diferenca).asDays();
   }
 
-  function renderizarStatus() {
-    return calcularDiasDoVencimento() > 0 ? "ABERTA" : "VENCIDA";
+  function renderizarStatus(apolice) {
+    return calcularDiasDoVencimento(apolice) > 0 ? "ABERTA" : "VENCIDA";
   }
 
   function handleClickFecharModalCadastrarApolice() {
     setExibirModalCriarApolice(false);
     setNovaApolice({ apoliceNumero: 0, placa: "", vigenciaInicio: "", vigenciaFim: "", valor: "" });
+  }
+
+  function handleClickFecharModalEditarApolice() {
+    setExibirModalEditarApolice(false)
+    resetarApoliceSelecionada();
   }
 
   function handleSubmitCadastrarApolice(e) {
@@ -66,14 +88,49 @@ function Apolices() {
     let auxApolice = { 
       id: criarId(),
       ...novaApolice,
-      diasAteOVencimento: calcularDiasDoVencimento(),
-      status: renderizarStatus()
+      diasAteOVencimento: calcularDiasDoVencimento(novaApolice),
+      status: renderizarStatus(novaApolice)
     };
 
     setApolices([ ...apolices, auxApolice ]);
     setNovaApolice({ apoliceNumero: 0, placa: "", vigenciaInicio: "", vigenciaFim: "", valor: "" });
     setExibirModalCriarApolice(false);
     toast.success("Apólice cadastrada com sucesso!");
+  }
+
+  function handleClickEditarApolice (apolice) {
+    setApoliceSelecionada(apolice);
+    setExibirModalEditarApolice(true);
+  }
+
+  function handleSubmitEditarApolice(e) {
+    e.preventDefault();
+    
+    let auxApolices = [ ...apolices ],
+        auxApolice = { 
+          ...apoliceSelecionada,
+          diasAteOVencimento: calcularDiasDoVencimento(apoliceSelecionada),
+          status: renderizarStatus(apoliceSelecionada)
+        };
+    
+    auxApolices = auxApolices.filter(c => { return c.id !== auxApolice.id });
+
+    setApolices([ ...auxApolices, auxApolice ]);
+    resetarApoliceSelecionada();
+    setExibirModalEditarApolice(false);
+    toast.success("Apólice editada com sucesso!");
+  }
+
+  function handleClickExcluirApolice() {
+    let auxApolices = [ ...apolices ];
+    
+    auxApolices = auxApolices.filter(c => { return c.id !== apoliceSelecionada.id });
+
+    setApolices(auxApolices);
+    setExibirModalExcluirApolice(false);
+    setExibirModalEditarApolice(false);
+    resetarApoliceSelecionada();
+    toast.success("Apólice excluída com sucesso!");
   }
 
   return (
@@ -109,7 +166,7 @@ function Apolices() {
                             <td style={{ verticalAlign: 'middle' }}>{apolice.diasAteOVencimento} <Badge color={apolice.status === "VENCIDA" ? "danger" : "success"}>{apolice.status}</Badge></td>
                             <td style={{ verticalAlign: 'middle' }}>R${renderizarValor(apolice.valor)}</td>
                             <td style={{ verticalAlign: 'middle' }}>
-                              <Button color="link"><FaPen size={14} /> Editar</Button>
+                              <Button color="link" onClick={() => handleClickEditarApolice(apolice)}><FaPen size={14} /> Editar</Button>
                             </td>
                           </tr>
                         )
@@ -168,6 +225,66 @@ function Apolices() {
             <Button type="submit" color="success">Cadastrar</Button>
           </ModalFooter>
         </Form>
+      </Modal>
+      <Modal isOpen={exibirModalEditarApolice}>
+        <ModalHeader toggle={() => handleClickFecharModalEditarApolice()}>Editar apólice</ModalHeader>
+        <Form onSubmit={handleSubmitEditarApolice}>
+          <ModalBody>
+            <Row>
+              <Col sm="12" md="4">
+                <FormGroup>
+                  <Label for="input-apoliceNumero"><span className="span-obrigatorio">*</span> Número</Label>
+                  <Input type="number" id="input-apoliceNumero" value={apoliceSelecionada.apoliceNumero} onChange={e => setApoliceSelecionada({ ...apoliceSelecionada, apoliceNumero: e.target.value })} required />
+                </FormGroup>
+              </Col>
+              <Col sm="12" md="8">
+                <FormGroup>
+                  <Label for="input-placa"><span className="span-obrigatorio">*</span> Placa</Label>
+                  <Input type="text" id="input-placa" value={apoliceSelecionada.placa} onChange={e => setApoliceSelecionada({ ...apoliceSelecionada, placa: e.target.value })} required />
+                </FormGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm="12" md="6">
+                <FormGroup>
+                  <Label for="input-vigenciaInicio"><span className="span-obrigatorio">*</span> Início da vigência</Label>
+                  <Input type="date" id="input-vigenciaInicio" value={apoliceSelecionada.vigenciaInicio} onChange={e => setApoliceSelecionada({ ...apoliceSelecionada, vigenciaInicio: e.target.value })} required />
+                </FormGroup>
+              </Col>
+              <Col sm="12" md="6">
+                <FormGroup>
+                  <Label for="input-vigenciaFim"><span className="span-obrigatorio">*</span> Fim da vigência</Label>
+                  <Input type="date" id="input-vigenciaFim" value={apoliceSelecionada.vigenciaFim} onChange={e => setApoliceSelecionada({ ...apoliceSelecionada, vigenciaFim: e.target.value })} required />
+                </FormGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm="12" md="6">
+                <FormGroup>
+                  <Label for="input-valor"><span className="span-obrigatorio">*</span> Valor</Label>
+                  <Input type="text" id="input-valor" value={apoliceSelecionada.valor} onChange={e => setApoliceSelecionada({ ...apoliceSelecionada, valor: e.target.value })} required />
+                </FormGroup>
+              </Col>
+            </Row>
+          </ModalBody>
+          <ModalFooter className="d-flex justify-content-between">
+            <Button tyle="button" color="danger" onClick={() => setExibirModalExcluirApolice(true)}>Excluir</Button>
+            <div>
+              <Button type="button" outline color="secondary" onClick={() => handleClickFecharModalEditarApolice()}>Cancelar</Button>{' '}
+              <Button type="submit" color="success">Editar</Button>
+            </div>
+          </ModalFooter>
+        </Form>
+      </Modal>
+      <Modal isOpen={exibirModalExcluirApolice}>
+        <ModalHeader toggle={() => setExibirModalExcluirApolice(false)}>Excluir apólice</ModalHeader>
+        <ModalBody>
+          <p style={{ marginBottom: 0 }}>Você tem certeza que deseja excluir a apólice {apoliceSelecionada.apoliceNumero}? Cuidado, essa ação não poderá ser desfeita!</p>
+        </ModalBody>
+        <ModalFooter className="d-flex justify-content-center">
+          <Button type="button" outline color="secondary" onClick={() => setExibirModalExcluirApolice(false)}>Cancelar</Button>{' '}
+          <Button type="submit" color="danger" onClick={() => handleClickExcluirApolice()}>Excluir</Button>
+        </ModalFooter>
       </Modal>
     </Row>
   );
