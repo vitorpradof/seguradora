@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
-import { Row, Col, Table, Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, Label, FormGroup, Input } from 'reactstrap';
-import { FaPen, FaPlus, FaExclamationCircle } from 'react-icons/fa';
+import { Row, Col, Table, Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, Label, FormGroup, Input, InputGroup, InputGroupAddon } from 'reactstrap';
+import { FaPen, FaPlus, FaExclamationCircle, FaSearch, FaTimes } from 'react-icons/fa';
 import { ImSpinner8 } from 'react-icons/im';
 import { toast } from 'react-toastify';
 
@@ -10,6 +10,8 @@ function Clientes() {
   const [iniciando, setIniciando] = useState(true);
   const [clientes, setClientes] = useState([]);
   const [clienteSelecionado, setClienteSelecionado] = useState({});
+  const [filtroCPF, setFiltroCPF] = useState('');
+  const [clientesFiltroOn, setClientesFiltroOn] = useState([]);
   const [exibirModalCriarCliente, setExibirModalCriarCliente] = useState(false);
   const [exibirModalEditarCliente, setExibirModalEditarCliente] = useState(false);
   const [exibirModalExcluirCliente, setExibirModalExcluirCliente] = useState(false);
@@ -42,6 +44,22 @@ function Clientes() {
     const auxClientes = localStorage.getItem("clientes");
     setClientes(auxClientes ? JSON.parse(auxClientes) : []);
     setIniciando(false);
+  }
+
+  function handleClickFiltrarCpf() {
+    let auxClientes = [ ...clientes ];
+    
+    setClientesFiltroOn(auxClientes);
+
+    auxClientes = auxClientes.filter(cliente => { return cliente.cpf.indexOf(filtroCPF) >= 0 });
+
+    setClientes(auxClientes);
+  }
+
+  function handleClickFecharFiltro() {
+    setClientes([ ...clientesFiltroOn ]);
+    setClientesFiltroOn([]);
+    setFiltroCPF('');
   }
 
   function handleClickFecharModalCadastrarCliente() {
@@ -111,9 +129,15 @@ function Clientes() {
 
     delete auxCliente.sobrenomes;
 
+    if (clientesFiltroOn.length) {
+      let auxClientesFiltroOn = [ ...clientesFiltroOn ];
+      auxClientesFiltroOn = auxClientesFiltroOn.filter(c => { return c.id !== auxCliente.id });
+      setClientesFiltroOn([ ...auxClientesFiltroOn, auxCliente ]);
+    }
+
     setClientes([ ...auxClientes, auxCliente ]);
     resetarClienteSelecionado();
-    setExibirModalCriarCliente(false);
+    setExibirModalEditarCliente(false);
     toast.success("Cliente editado com sucesso!");
   }
 
@@ -141,30 +165,47 @@ function Clientes() {
               <Button type="button" color="success" style={{ marginBottom: 15 }} onClick={() => setExibirModalCriarCliente(true)}> <FaPlus size={12} /> Novo cliente</Button>
               { 
                 clientes.length ?
-                  <Table hover responsive striped size="sm">
-                    <thead>
-                      <tr>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Localização</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        clientes.map(cliente => 
-                          <tr key={cliente.id}>
-                            <td style={{ verticalAlign: 'middle' }}>{cliente.nome.primeiroNome} {cliente.nome.ultimoNome}</td>
-                            <td style={{ verticalAlign: 'middle' }}>{cliente.cpf}</td>
-                            <td style={{ verticalAlign: 'middle' }}>{cliente.cidade}/{cliente.uf}</td>
-                            <td style={{ verticalAlign: 'middle' }}>
-                              <Button color="link" onClick={() => handleClickEditarCliente(cliente)}><FaPen size={14} /> Editar</Button>
-                            </td>
-                          </tr>
-                        )
-                      }
-                    </tbody>
-                  </Table> 
+                  <div>
+                    <Row>
+                      <Col xs="12" sm={{ size: 6, offset: 6 }} md={{ size: 3, offset: 9 }} lg={{ size: 2, offset: 10 }}>
+                        <FormGroup>
+                          <InputGroup>
+                            <Input type="text" placeholder="CPF" value={filtroCPF} onChange={(e) => setFiltroCPF(e.target.value)} />
+                            {
+                              clientesFiltroOn.length ?
+                                <InputGroupAddon addonType="append"><Button color="danger" onClick={() => handleClickFecharFiltro()}><FaTimes /></Button></InputGroupAddon>
+                              : <InputGroupAddon addonType="append"><Button color="primary" onClick={() => handleClickFiltrarCpf()}><FaSearch /></Button></InputGroupAddon>
+
+                            }
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Table hover responsive striped>
+                      <thead>
+                        <tr>
+                          <th>Nome</th>
+                          <th>CPF</th>
+                          <th>Localização</th>
+                          <th>Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          clientes.map(cliente => 
+                            <tr key={cliente.id}>
+                              <td style={{ verticalAlign: 'middle' }}>{cliente.nome.primeiroNome} {cliente.nome.ultimoNome}</td>
+                              <td style={{ verticalAlign: 'middle' }}>{cliente.cpf}</td>
+                              <td style={{ verticalAlign: 'middle' }}>{cliente.cidade}/{cliente.uf}</td>
+                              <td style={{ verticalAlign: 'middle' }}>
+                                <Button color="link" onClick={() => handleClickEditarCliente(cliente)}><FaPen size={14} /> Editar</Button>
+                              </td>
+                            </tr>
+                          )
+                        }
+                      </tbody>
+                    </Table> 
+                  </div>
                 : <p style={{ marginBottom: 0 }} className="d-flex align-items-center"> <FaExclamationCircle style={{ marginRight: 5 }} /> Ainda não existem clientes cadastrados.</p>
               }
             </div>
