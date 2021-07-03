@@ -146,6 +146,12 @@ function Clientes() {
     
     auxClientes = auxClientes.filter(c => { return c.id !== clienteSelecionado.id });
 
+    if (clientesFiltroOn.length) {
+      let auxClientesFiltroOn = [ ...clientesFiltroOn ];
+      auxClientesFiltroOn = auxClientesFiltroOn.filter(c => { return c.id !== clienteSelecionado.id });
+      setClientesFiltroOn([ ...auxClientesFiltroOn ]);
+    }
+
     setClientes(auxClientes);
     setExibirModalExcluirCliente(false);
     setExibirModalEditarCliente(false);
@@ -163,49 +169,46 @@ function Clientes() {
             : 
             <div>
               <Button type="button" color="success" style={{ marginBottom: 15 }} onClick={() => setExibirModalCriarCliente(true)}> <FaPlus size={12} /> Novo cliente</Button>
+              <Row>
+                <Col xs="12" sm={{ size: 6, offset: 6 }} md={{ size: 3, offset: 9 }} lg={{ size: 2, offset: 10 }}>
+                  <FormGroup>
+                    <InputGroup>
+                      <Input type="text" placeholder="CPF" value={filtroCPF} onChange={(e) => setFiltroCPF(e.target.value)} />
+                      {
+                        clientesFiltroOn.length ?
+                          <InputGroupAddon addonType="append"><Button color="danger" onClick={() => handleClickFecharFiltro()}><FaTimes /></Button></InputGroupAddon>
+                        : <InputGroupAddon addonType="append"><Button color="primary" onClick={() => handleClickFiltrarCpf()}><FaSearch /></Button></InputGroupAddon>
+                      }
+                    </InputGroup>
+                  </FormGroup>
+                </Col>
+              </Row>
               { 
                 clientes.length ?
-                  <div>
-                    <Row>
-                      <Col xs="12" sm={{ size: 6, offset: 6 }} md={{ size: 3, offset: 9 }} lg={{ size: 2, offset: 10 }}>
-                        <FormGroup>
-                          <InputGroup>
-                            <Input type="text" placeholder="CPF" value={filtroCPF} onChange={(e) => setFiltroCPF(e.target.value)} />
-                            {
-                              clientesFiltroOn.length ?
-                                <InputGroupAddon addonType="append"><Button color="danger" onClick={() => handleClickFecharFiltro()}><FaTimes /></Button></InputGroupAddon>
-                              : <InputGroupAddon addonType="append"><Button color="primary" onClick={() => handleClickFiltrarCpf()}><FaSearch /></Button></InputGroupAddon>
-
-                            }
-                          </InputGroup>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Table hover responsive striped>
-                      <thead>
-                        <tr>
-                          <th>Nome</th>
-                          <th>CPF</th>
-                          <th>Localização</th>
-                          <th>Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {
-                          clientes.map(cliente => 
-                            <tr key={cliente.id}>
-                              <td style={{ verticalAlign: 'middle' }}>{cliente.nome.primeiroNome} {cliente.nome.ultimoNome}</td>
-                              <td style={{ verticalAlign: 'middle' }}>{cliente.cpf}</td>
-                              <td style={{ verticalAlign: 'middle' }}>{cliente.cidade}/{cliente.uf}</td>
-                              <td style={{ verticalAlign: 'middle' }}>
-                                <Button color="link" onClick={() => handleClickEditarCliente(cliente)}><FaPen size={14} /> Editar</Button>
-                              </td>
-                            </tr>
-                          )
-                        }
-                      </tbody>
-                    </Table> 
-                  </div>
+                  <Table hover responsive striped>
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Localização</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        clientes.map(cliente => 
+                          <tr key={cliente.id}>
+                            <td style={{ verticalAlign: 'middle' }}>{cliente.nome.primeiroNome} {cliente.nome.ultimoNome}</td>
+                            <td style={{ verticalAlign: 'middle' }}>{cliente.cpf}</td>
+                            <td style={{ verticalAlign: 'middle' }}>{cliente.cidade}/{cliente.uf}</td>
+                            <td style={{ verticalAlign: 'middle' }}>
+                              <Button color="link" onClick={() => handleClickEditarCliente(cliente)}><FaPen size={14} /> Editar</Button>
+                            </td>
+                          </tr>
+                        )
+                      }
+                    </tbody>
+                  </Table> 
                 : <p style={{ marginBottom: 0 }} className="d-flex align-items-center"> <FaExclamationCircle style={{ marginRight: 5 }} /> Ainda não existem clientes cadastrados.</p>
               }
             </div>

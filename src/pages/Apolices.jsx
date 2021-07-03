@@ -150,6 +150,14 @@ function Apolices() {
     
     auxApolices = auxApolices.filter(c => { return c.id !== apoliceSelecionada.id });
 
+    if (apolicesFiltroOn.length) {
+      let auxApolicesFiltroOn = [ ...apolicesFiltroOn ];
+
+      auxApolicesFiltroOn = auxApolicesFiltroOn.filter(c => { return c.id !== apoliceSelecionada.id });
+
+      setApolicesFiltroOn([ ...auxApolicesFiltroOn ]);
+    }
+
     setApolices(auxApolices);
     setExibirModalExcluirApolice(false);
     setExibirModalEditarApolice(false);
@@ -167,53 +175,51 @@ function Apolices() {
             : 
             <div>
               <Button type="button" color="success" style={{ marginBottom: 15 }} onClick={() => setExibirModalCriarApolice(true)}> <FaPlus size={12} /> Nova apolice</Button>
+              <Row>
+                <Col xs="12" sm={{ size: 6, offset: 6 }} md={{ size: 3, offset: 9 }} lg={{ size: 2, offset: 10 }}>
+                  <FormGroup>
+                    <InputGroup>
+                      <Input type="text" placeholder="Número" value={filtroNumero} onChange={(e) => setFiltroNumero(e.target.value)} />
+                      {
+                        apolicesFiltroOn.length ?
+                          <InputGroupAddon addonType="append"><Button color="danger" onClick={() => handleClickFecharFiltro()}><FaTimes /></Button></InputGroupAddon>
+                        : <InputGroupAddon addonType="append"><Button color="primary" onClick={() => handleClickFiltrarNumero()}><FaSearch /></Button></InputGroupAddon>
+
+                      }
+                    </InputGroup>
+                  </FormGroup>
+                </Col>
+              </Row>
               { 
                 apolices.length ?
-                  <div>
-                    <Row>
-                      <Col xs="12" sm={{ size: 6, offset: 6 }} md={{ size: 3, offset: 9 }} lg={{ size: 2, offset: 10 }}>
-                        <FormGroup>
-                          <InputGroup>
-                            <Input type="text" placeholder="Número" value={filtroNumero} onChange={(e) => setFiltroNumero(e.target.value)} />
-                            {
-                              apolicesFiltroOn.length ?
-                                <InputGroupAddon addonType="append"><Button color="danger" onClick={() => handleClickFecharFiltro()}><FaTimes /></Button></InputGroupAddon>
-                              : <InputGroupAddon addonType="append"><Button color="primary" onClick={() => handleClickFiltrarNumero()}><FaSearch /></Button></InputGroupAddon>
-
-                            }
-                          </InputGroup>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Table hover responsive striped size="sm">
-                      <thead>
-                        <tr>
-                          <th>Apólice</th>
-                          <th>Placa</th>
-                          <th>Vigência</th>
-                          <th>Dias até o vencimento</th>
-                          <th>Valor</th>
-                          <th>Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {
-                          apolices.map(apolice => 
-                            <tr key={apolice.id}>
-                              <td style={{ verticalAlign: 'middle' }}>{apolice.apoliceNumero}</td>
-                              <td style={{ verticalAlign: 'middle' }}>{apolice.placa}</td>
-                              <td style={{ verticalAlign: 'middle' }}>{renderizarData(apolice.vigenciaInicio)} até {renderizarData(apolice.vigenciaFim)}</td>
-                              <td style={{ verticalAlign: 'middle' }}>{apolice.diasAteOVencimento} <Badge color={apolice.status === "VENCIDA" ? "danger" : "success"}>{apolice.status}</Badge></td>
-                              <td style={{ verticalAlign: 'middle' }}>R${renderizarValor(apolice.valor)}</td>
-                              <td style={{ verticalAlign: 'middle' }}>
-                                <Button color="link" onClick={() => handleClickEditarApolice(apolice)}><FaPen size={14} /> Editar</Button>
-                              </td>
-                            </tr>
-                          )
-                        }
-                      </tbody>
-                    </Table>
-                  </div>
+                  <Table hover responsive striped size="sm">
+                    <thead>
+                      <tr>
+                        <th>Apólice</th>
+                        <th>Placa</th>
+                        <th>Vigência</th>
+                        <th>Dias até o vencimento</th>
+                        <th>Valor</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        apolices.map(apolice => 
+                          <tr key={apolice.id}>
+                            <td style={{ verticalAlign: 'middle' }}>{apolice.apoliceNumero}</td>
+                            <td style={{ verticalAlign: 'middle' }}>{apolice.placa}</td>
+                            <td style={{ verticalAlign: 'middle' }}>{renderizarData(apolice.vigenciaInicio)} até {renderizarData(apolice.vigenciaFim)}</td>
+                            <td style={{ verticalAlign: 'middle' }}>{apolice.diasAteOVencimento} <Badge color={apolice.status === "VENCIDA" ? "danger" : "success"}>{apolice.status}</Badge></td>
+                            <td style={{ verticalAlign: 'middle' }}>R${renderizarValor(apolice.valor)}</td>
+                            <td style={{ verticalAlign: 'middle' }}>
+                              <Button color="link" onClick={() => handleClickEditarApolice(apolice)}><FaPen size={14} /> Editar</Button>
+                            </td>
+                          </tr>
+                        )
+                      }
+                    </tbody>
+                  </Table>
                 : <p style={{ marginBottom: 0 }} className="d-flex align-items-center"> <FaExclamationCircle style={{ marginRight: 5 }} /> Ainda não existem apolices cadastradas.</p>
               }
             </div>
