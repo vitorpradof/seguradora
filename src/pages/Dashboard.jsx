@@ -13,14 +13,17 @@ function Inicio() {
         auxApolices = JSON.parse(localStorage.getItem("apolices")),
         auxStatusApolices = { abertas: 0, vencidas: 0 };
 
+    auxClientes = auxClientes ? auxClientes : [];
+    auxApolices = auxApolices ? auxApolices : [];
+
     auxApolices.map(a => {
       if (a.diasAteOVencimento > 0) auxStatusApolices.abertas++;
       else auxStatusApolices.vencidas++;
       return 0;
     });
 
-    setClientes(auxClientes ? auxClientes : []);
-    setApolices(auxApolices ? auxApolices : []);
+    setClientes(auxClientes);
+    setApolices(auxApolices);
     setStatusApolices(auxStatusApolices);
 
   }, []);
