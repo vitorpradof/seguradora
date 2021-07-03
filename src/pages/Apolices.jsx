@@ -24,7 +24,7 @@ function Apolices() {
   }, []);
 
   useEffect (() => {
-    if (apolices.length) localStorage.setItem("apolices", JSON.stringify(apolices));
+    localStorage.setItem("apolices", JSON.stringify(apolices));
   }, [apolices]);
 
   function resetarApoliceSelecionada() {

@@ -22,7 +22,7 @@ function Clientes() {
   }, []);
 
   useEffect (() => {
-    if (clientes.length) localStorage.setItem("clientes", JSON.stringify(clientes));
+    localStorage.setItem("clientes", JSON.stringify(clientes));
   }, [clientes]);
 
   function resetarClienteSelecionado() {
