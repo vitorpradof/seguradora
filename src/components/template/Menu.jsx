@@ -3,6 +3,17 @@ import { NavLink } from 'react-router-dom';
 import { MdDashboard, MdGroup, MdInsertDriveFile } from 'react-icons/md';
 
 function Menu() {
+
+  function fecharMenu() {
+    let body = document.querySelector('body');
+
+    if (body.classList.contains('sidebar-open')) {
+      body.classList.add('sidebar-closed');
+      body.classList.add('sidebar-collapse');
+      body.classList.remove('sidebar-open');
+    }
+  };
+
   return (
     <aside className='main-sidebar sidebar-dark-primary elevation-4'>
       <div className='sidebar'>
@@ -12,6 +23,7 @@ function Menu() {
               <NavLink
                 type='button'
                 to='/dashboard'
+                onClick={() => fecharMenu()}
                 className='nav-link d-flex align-items-center'
               >
                 <MdDashboard />
@@ -22,6 +34,7 @@ function Menu() {
               <NavLink
                 type='button'
                 to='/apolices'
+                onClick={() => fecharMenu()}
                 className='nav-link d-flex align-items-center'
               >
                 <MdInsertDriveFile />
@@ -32,6 +45,7 @@ function Menu() {
               <NavLink
                 type='button'
                 to='/clientes'
+                onClick={() => fecharMenu()}
                 className='nav-link d-flex align-items-center'
               >
                 <MdGroup />
