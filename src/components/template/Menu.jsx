@@ -8,7 +8,7 @@ function Menu() {
       <div className='sidebar'>
         <nav className='mt-2'>
           <ul className='nav nav-pills nav-sidebar flex-column' data-widget='treeview' role='menu' data-accordion='false'>
-            <li style={{ marginBottom: '10px' }} className='nav-item'>
+            <li className='nav-item'>
               <NavLink
                 type='button'
                 to='/dashboard'
