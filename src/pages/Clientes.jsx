@@ -11,6 +11,7 @@ function Clientes() {
   const [clienteSelecionado, setClienteSelecionado] = useState({});
   const [exibirModalCriarCliente, setExibirModalCriarCliente] = useState(false);
   const [exibirModalEditarCliente, setExibirModalEditarCliente] = useState(false);
+  const [exibirModalExcluirCliente, setExibirModalExcluirCliente] = useState(false);
 
   useEffect (() => {
     resetarClienteSelecionado();
@@ -85,7 +86,6 @@ function Clientes() {
       auxCliente.sobrenomes += sobrenome;
     });
 
-
     setClienteSelecionado(auxCliente);
     setExibirModalEditarCliente(true);
   }
@@ -112,6 +112,17 @@ function Clientes() {
     setClientes([ ...auxClientes, auxCliente ]);
     resetarClienteSelecionado();
     setExibirModalCriarCliente(false);
+  }
+
+  function handleClickExcluirCliente() {
+    let auxClientes = [ ...clientes ];
+    
+    auxClientes = auxClientes.filter(c => { return c.id !== clienteSelecionado.id });
+
+    setClientes(auxClientes);
+    setExibirModalExcluirCliente(false);
+    setExibirModalEditarCliente(false);
+    resetarClienteSelecionado();
   }
 
   return (
@@ -244,11 +255,24 @@ function Clientes() {
               </Col>
             </Row>
           </ModalBody>
-          <ModalFooter>
-            <Button type="button" outline color="secondary" onClick={() => handleClickFecharModalEditarCliente()}>Cancelar</Button>{' '}
-            <Button type="submit" color="success">Editar</Button>
+          <ModalFooter className="d-flex justify-content-between">
+            <Button tyle="button" color="danger" onClick={() => setExibirModalExcluirCliente(true)}>Excluir</Button>
+            <div>
+              <Button type="button" outline color="secondary" onClick={() => handleClickFecharModalEditarCliente()}>Cancelar</Button>{' '}
+              <Button type="submit" color="success">Editar</Button>
+            </div>
           </ModalFooter>
         </Form>
+      </Modal>
+      <Modal isOpen={exibirModalExcluirCliente}>
+        <ModalHeader toggle={() => setExibirModalExcluirCliente(false)}>Excluir cliente</ModalHeader>
+        <ModalBody>
+          <p style={{ marginBottom: 0 }}>Você tem certeza que deseja excluir o cliente {clienteSelecionado.nome} {clienteSelecionado.sobrenomes}? Cuidado, essa ação não poderá ser desfeita!</p>
+        </ModalBody>
+        <ModalFooter className="d-flex justify-content-center">
+          <Button type="button" outline color="secondary" onClick={() => setExibirModalExcluirCliente(false)}>Cancelar</Button>{' '}
+          <Button type="submit" color="danger" onClick={() => handleClickExcluirCliente()}>Excluir</Button>
+        </ModalFooter>
       </Modal>
     </Row>
   );
