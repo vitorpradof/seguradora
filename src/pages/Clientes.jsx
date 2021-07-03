@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Row, Col, Table, Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, Label, FormGroup, Input } from 'reactstrap';
 import { FaPen, FaPlus, FaExclamationCircle } from 'react-icons/fa';
 import { ImSpinner8 } from 'react-icons/im';
+import { toast } from 'react-toastify';
 
 function Clientes() {
 
@@ -73,6 +74,7 @@ function Clientes() {
     setClientes([ ...clientes, auxCliente ]);
     resetarClienteSelecionado();
     setExibirModalCriarCliente(false);
+    toast.success("Cliente cadastrado com sucesso!");
   }
 
   function handleClickEditarCliente (cliente) {
@@ -112,6 +114,7 @@ function Clientes() {
     setClientes([ ...auxClientes, auxCliente ]);
     resetarClienteSelecionado();
     setExibirModalCriarCliente(false);
+    toast.success("Cliente editado com sucesso!");
   }
 
   function handleClickExcluirCliente() {
@@ -123,6 +126,7 @@ function Clientes() {
     setExibirModalExcluirCliente(false);
     setExibirModalEditarCliente(false);
     resetarClienteSelecionado();
+    toast.success("Cliente excluído com sucesso!");
   }
 
   return (
